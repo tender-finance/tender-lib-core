@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity >=0.8.10;
 
-import "./ComptrollerInterface.sol";
-import "./InterestRateModel.sol";
-import "./EIP20NonStandardInterface.sol";
-import "./ErrorReporter.sol";
+import {ComptrollerInterface} from "./ComptrollerInterface.sol";
+import {InterestRateModel} from "./InterestRateModel.sol";
+import {EIP20NonStandardInterface} from "./EIP20NonStandardInterface.sol";
+import {TokenErrorReporter} from "./ErrorReporter.sol";
 
 contract CTokenStorage {
     /**

@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity >=0.8.10;
 
-import "./CTokenInterfaces.sol";
+import {CTokenInterface, CErc20Interface, CDelegatorInterface} from "./CTokenInterfaces.sol";
+import {ComptrollerInterface} from "./ComptrollerInterface.sol";
+import {InterestRateModel} from './InterestRateModel.sol';
 import {IRewardRouterV2} from "../external/gmx/IRewardRouterV2.sol";
 import {IStakedGlp} from "../external/gmx/IStakedGlp.sol";
-import "./EIP20Interface.sol";
-import "oz/interfaces/IERC721Receiver.sol";
+import {IERC721Receiver} from "oz/interfaces/IERC721Receiver.sol";
+import {EIP20Interface} from "./EIP20Interface.sol";
+import {EIP20NonStandardInterface} from './EIP20NonStandardInterface.sol';
 
 /**
  * @title Compound's CErc20Delegator Contract

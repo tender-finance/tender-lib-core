@@ -1,7 +1,14 @@
 pragma solidity ^0.8.10;
 pragma experimental ABIEncoderV2;
 
-import "./GovernorBravoInterfaces.sol";
+import {
+  GovernorBravoDelegateStorageV1,
+  GovernorBravoDelegateStorageV2,
+  GovernorBravoEvents,
+  TimelockInterface,
+  CompInterface,
+  GovernorAlpha
+} from "./GovernorBravoInterfaces.sol";
 
 contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
 

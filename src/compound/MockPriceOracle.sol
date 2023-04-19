@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-import "./CToken.sol";
+import {CToken} from "./CToken.sol";
 
 pragma solidity >=0.8.10;
 
