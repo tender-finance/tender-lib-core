@@ -15,7 +15,7 @@ import "./../lib/interface/IStakedGlp.sol";
  * @notice Abstract base for CTokens
  * @author Compound
  */
-abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorReporter {
+abstract contract CTokenTnd is CTokenInterface, ExponentialNoError, TokenErrorReporter {
     /**
      * @notice Initialize the money market
      * @param comptroller_ The address of the Comptroller

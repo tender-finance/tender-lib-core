@@ -2,13 +2,23 @@
 pragma solidity ^0.8.10;
 
 import "./InterestRateModel.sol";
+import "./../lib/interface/AggregatorInterface.sol";
+
+interface IRewardDistributor {
+
+    function rewardToken() external view returns (address);
+    function tokensPerInterval() external view returns (uint256);
+    function pendingRewards() external view returns (uint256);
+    function distribute() external returns (uint256);
+
+}
 
 /**
   * @title Logic for Compound's JumpRateModel Contract V2.
   * @author Compound (modified by Dharma Labs, refactored by Arr00)
   * @notice Version 2 modifies Version 1 by enabling updateable parameters.
   */
-abstract contract BaseJumpRateModelV2 is InterestRateModel {
+abstract contract BaseJumpRateModelV2Gmx is InterestRateModel {
     event NewInterestParams(uint baseRatePerBlock, uint multiplierPerBlock, uint jumpMultiplierPerBlock, uint kink);
 
     uint256 private constant BASE = 1e18;
@@ -42,6 +52,13 @@ abstract contract BaseJumpRateModelV2 is InterestRateModel {
      * @notice The utilization point at which the jump multiplier is applied
      */
     uint public kink;
+
+    IRewardDistributor public gmxDistributor = IRewardDistributor(0x1DE098faF30bD74F22753c28DB17A2560D4F5554);
+
+    //store gmx price for slippage calculation
+    AggregatorInterface gmxOracleFeed = AggregatorInterface(0xDB98056FecFff59D032aB628337A4887110df3dB);
+    //store eth price for slippage calculation
+    AggregatorInterface wethOracleFeed = AggregatorInterface(0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612);
 
     /**
      * @notice Construct an interest rate model
@@ -86,6 +103,26 @@ abstract contract BaseJumpRateModelV2 is InterestRateModel {
         return borrows * BASE / (cash + borrows - reserves);
     }
 
+    function getGmxAmountTokenPerInterval() internal view returns (uint){
+        
+        uint256 ethPerInterval = gmxDistributor.tokensPerInterval();
+        uint256 ethPrice = wethOracleFeed.latestAnswer();
+        uint256 gmxPrice = gmxOracleFeed.latestAnswer();
+
+        return (ethPerInterval * ethPrice) / gmxPrice;
+
+    }
+
+    function getGmxAmountTokenPerInterval_() public view returns (uint){
+        
+        uint256 ethPerInterval = gmxDistributor.tokensPerInterval();
+        uint256 ethPrice = wethOracleFeed.latestAnswer();
+        uint256 gmxPrice = gmxOracleFeed.latestAnswer();
+
+        return ((ethPerInterval * ethPrice) / gmxPrice ) / 10000000;
+
+    }
+
     /**
      * @notice Calculates the current borrow rate per block, with the error code expected by the market
      * @param cash The amount of cash in the market
@@ -97,13 +134,15 @@ abstract contract BaseJumpRateModelV2 is InterestRateModel {
         uint util = utilizationRate(cash, borrows, reserves);
 
         if (util <= kink) {
-            return ((util * multiplierPerBlock) / BASE) + baseRatePerBlock;
+            return ((util * multiplierPerBlock) / BASE) + baseRatePerBlock + getGmxAmountTokenPerInterval();
         } else {
             uint normalRate = ((kink * multiplierPerBlock) / BASE) + baseRatePerBlock;
             uint excessUtil = util - kink;
-            return ((excessUtil * jumpMultiplierPerBlock) / BASE) + normalRate;
+            return ((excessUtil * jumpMultiplierPerBlock) / BASE) + normalRate + getGmxAmountTokenPerInterval();
         }
     }
+
+    
 
     /**
      * @notice Calculates the current supply rate per block

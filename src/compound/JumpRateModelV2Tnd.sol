@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.10;
 
-import "./BaseJumpRateModelV2.sol";
+import "./BaseJumpRateModelV2Tnd.sol";
 import "./InterestRateModel.sol";
 
 
@@ -10,7 +10,7 @@ import "./InterestRateModel.sol";
   * @author Arr00
   * @notice Supports only for V2 cTokens
   */
-contract JumpRateModelV2 is InterestRateModel, BaseJumpRateModelV2  {
+contract JumpRateModelV2Tnd is InterestRateModel, BaseJumpRateModelV2Tnd  {
 
 	/**
      * @notice Calculates the current borrow rate per block
@@ -25,5 +25,5 @@ contract JumpRateModelV2 is InterestRateModel, BaseJumpRateModelV2  {
 
     constructor(uint baseRatePerYear, uint multiplierPerYear, uint jumpMultiplierPerYear, uint kink_, address owner_)
 
-    BaseJumpRateModelV2(baseRatePerYear,multiplierPerYear,jumpMultiplierPerYear,kink_,owner_) public {}
+    BaseJumpRateModelV2Tnd(baseRatePerYear,multiplierPerYear,jumpMultiplierPerYear,kink_,owner_) public {}
 }

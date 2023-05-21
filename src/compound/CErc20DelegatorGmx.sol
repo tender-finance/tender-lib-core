@@ -12,7 +12,7 @@ import "./../token/IERC721Receiver.sol";
  * @notice CTokens which wrap an EIP-20 underlying and delegate to an implementation
  * @author Compound
  */
-contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterface {
+contract CErc20DelegatorGmx is CTokenInterface, CErc20Interface, CDelegatorInterface {
     /**
      * @notice Construct a new money market
      * @param underlying_ The address of the underlying asset
@@ -22,7 +22,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      * @param name_ ERC-20 name of this token
      * @param symbol_ ERC-20 symbol of this token
      * @param decimals_ ERC-20 decimal precision of this token
-     * @param isGLP_ Wether or not the market being created is for the GLP token
      * @param admin_ Address of the administrator of this token
      * @param implementation_ The address of the implementation the contract delegates to
      * @param becomeImplementationData The encoded args for becomeImplementatioN  
@@ -34,7 +33,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
                 string memory name_,
                 string memory symbol_,
                 uint8 decimals_,
-                bool isGLP_,
                 address payable admin_,
                 address implementation_,
                 bytes memory becomeImplementationData) {
@@ -42,15 +40,15 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         admin = payable(msg.sender);
 
         // First delegate gets to initialize the delegator (i.e. storage contract)
-        delegateTo(implementation_, abi.encodeWithSignature("initialize(address,address,address,uint256,string,string,uint8,bool)",
+        delegateTo(implementation_, abi.encodeWithSignature("initialize(address,address,address,uint256,string,string,uint8)",
                                                             underlying_,
                                                             comptroller_,
                                                             interestRateModel_,
                                                             initialExchangeRateMantissa_,
                                                             name_,
                                                             symbol_,
-                                                            decimals_,
-                                                            isGLP_));
+                                                            decimals_
+                                                            ));
 
         // // New implementations always get set via the settor (post-initialize)
         _setImplementation(implementation_, false, becomeImplementationData);
@@ -75,7 +73,7 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         address oldImplementation = implementation;
         implementation = implementation_;
 
-        delegateToImplementation(abi.encodeWithSignature("_becomeImplementation(bytes)", becomeImplementationData));
+        // delegateToImplementation(abi.encodeWithSignature("_becomeImplementation(bytes)", becomeImplementationData));
 
         emit NewImplementation(oldImplementation, implementation);
     }
@@ -92,11 +90,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      */
     function mint(uint mintAmount) override external returns (uint) {
         bytes memory data = delegateToImplementation(abi.encodeWithSignature("mint(uint256)", mintAmount));
-        return abi.decode(data, (uint));
-    }
-
-    function compound() override external returns (uint){
-        bytes memory data = delegateToImplementation(abi.encodeWithSignature("compound()"));
         return abi.decode(data, (uint));
     }
 
@@ -162,6 +155,11 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      */
     function repayBorrowBehalf(address borrower, uint repayAmount) override external returns (uint) {
         bytes memory data = delegateToImplementation(abi.encodeWithSignature("repayBorrowBehalf(address,uint256)", borrower, repayAmount));
+        return abi.decode(data, (uint));
+    }
+
+    function compound() override external returns (uint){
+        bytes memory data = delegateToImplementation(abi.encodeWithSignature("compound()"));
         return abi.decode(data, (uint));
     }
 
@@ -461,6 +459,11 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         return abi.decode(data, (uint));
     }
 
+    function _setAutoCompoundBlockThreshold(uint256 autoCompoundBlockThreshold_) override public returns (uint) {
+        bytes memory data = delegateToImplementation(abi.encodeWithSignature("_setAutoCompoundBlockThreshold(uint256)", autoCompoundBlockThreshold_));
+        return abi.decode(data, (uint));
+    }
+
     /**
      * @notice Updates the fees for the vault strategy markets
      * @dev Admin function to update the fees
@@ -493,12 +496,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
      */
     function _setAutocompoundRewards(bool autocompound_) override public returns (uint) {
         bytes memory data = delegateToImplementation(abi.encodeWithSignature("_setAutocompoundRewards(bool)", autocompound_));
-        return abi.decode(data, (uint));
-    }
-
-    
-    function _setAutoCompoundBlockThreshold(uint256 autoCompoundBlockThreshold_) override public returns (uint) {
-        bytes memory data = delegateToImplementation(abi.encodeWithSignature("_setAutoCompoundBlockThreshold(uint256)", autoCompoundBlockThreshold_));
         return abi.decode(data, (uint));
     }
 

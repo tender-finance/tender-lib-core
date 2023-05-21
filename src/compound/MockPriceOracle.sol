@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
-import {CToken} from "./CToken.sol";
+import "./CToken.sol";
 
-pragma solidity >=0.8.10;
+pragma solidity ^0.8.10;
 
 contract MockPriceOracle {
     /// @notice Indicator that this is a PriceOracle contract (for inspection)

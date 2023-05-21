@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity >=0.8.10;
+pragma solidity ^0.8.10;
 
-import {ComptrollerInterface} from "./ComptrollerInterface.sol";
-import {InterestRateModel} from "./InterestRateModel.sol";
-import {EIP20NonStandardInterface} from "./EIP20NonStandardInterface.sol";
-import {TokenErrorReporter} from "./ErrorReporter.sol";
+import "./ComptrollerInterface.sol";
+import "./InterestRateModel.sol";
+import "./EIP20NonStandardInterface.sol";
+import "./ErrorReporter.sol";
+import "./../lib/interface/IGmxRewardRouter.sol";
+import "./../lib/interface/IStakedGlp.sol";
+import "./../lib/interface/IRewardTracker.sol";
 
 contract CTokenStorage {
     /**
@@ -25,12 +28,12 @@ contract CTokenStorage {
     /**
      * @notice GLP reward router for claiming rewards
      */
-    address public glpRewardRouter;
+    IGmxRewardRouter public glpRewardRouter;
 
     /**
      * @notice Staked GLP Adress to call transfer on
      */
-    address public stakedGLP;
+    IStakedGlp public stakedGLP;
 
     /**
      * @notice address of the GMX token
@@ -40,7 +43,7 @@ contract CTokenStorage {
     /**
      * @notice Address that handles GMX staking
      */
-    address public stakedGmxTracker;
+    IRewardTracker public stakedGmxTracker;
 
     /**
      * @notice address of the Staked GMX token
@@ -296,7 +299,7 @@ abstract contract CTokenInterface is CTokenStorage {
     function _setReserveFactor(uint newReserveFactorMantissa) virtual external returns (uint);
     function _reduceReserves(uint reduceAmount) virtual external returns (uint);
     function _setInterestRateModel(InterestRateModel newInterestRateModel) virtual external returns (uint);
-    function _setGlpAddresses(address stakedGLP_, address glpRewardRouter_, address glpManager_, address gmxToken_, address stakedGmxTracker_, address sbfGMX_) virtual public returns (uint);
+    function _setGlpAddresses(IStakedGlp stakedGLP_, IGmxRewardRouter glpRewardRouter_, address glpManager_, address gmxToken_, address stakedGmxTracker_, address sbfGMX_) virtual public returns (uint);
     function _signalTransfer(address recipient) virtual public returns (uint);
     function _setAutocompoundRewards(bool autocompound_) virtual public returns (uint);
     function _setAutoCompoundBlockThreshold(uint256 autoCompoundBlockThreshold_) virtual public returns (uint);

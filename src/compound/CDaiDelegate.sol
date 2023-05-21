@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity >=0.8.10;
+pragma solidity ^0.8.10;
 
-import {CErc20Delegate} from "./CErc20Delegate.sol";
-import {EIP20Interface} from "./EIP20Interface.sol";
+import "./CErc20Delegate.sol";
 
 /**
  * @title Compound's CDai Contract

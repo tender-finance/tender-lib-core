@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.10;
 
-import "./CToken.sol";
-import "./../token/IERC721.sol";
-import "./../token/IERC721Receiver.sol";
+import "./CTokenGmx.sol";
+import "./../lib/interface/IGmxRewardRouter.sol";
+import "./../lib/interface/IRewardTracker.sol";
+import "./IERC721.sol";
+import "./IERC721Receiver.sol";
 
 interface CompLike {
     function delegate(address delegatee) external;
@@ -14,7 +16,7 @@ interface CompLike {
  * @notice CTokens which wrap an EIP-20 underlying
  * @author Compound
  */
-contract CErc20 is CToken, CErc20Interface {
+contract CErc20Gmx is CTokenGmx, CErc20Interface {
     /**
      * @notice Initialize the new money market
      * @param underlying_ The address of the underlying asset
@@ -24,7 +26,6 @@ contract CErc20 is CToken, CErc20Interface {
      * @param name_ ERC-20 name of this token
      * @param symbol_ ERC-20 symbol of this token
      * @param decimals_ ERC-20 decimal precision of this token
-     * @param isGLP_ Wether or not the market being created is for the GLP token
      */
     function initialize(address underlying_,
                         ComptrollerInterface comptroller_,
@@ -32,10 +33,10 @@ contract CErc20 is CToken, CErc20Interface {
                         uint initialExchangeRateMantissa_,
                         string memory name_,
                         string memory symbol_,
-                        uint8 decimals_,
-                        bool isGLP_) public {
+                        uint8 decimals_
+                        ) public {
         // CToken initialize does the bulk of the work
-        super.initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_, isGLP_);
+        super.initialize(comptroller_, interestRateModel_, initialExchangeRateMantissa_, name_, symbol_, decimals_);
 
         // Set underlying and sanity check it
         underlying = underlying_;
@@ -55,7 +56,6 @@ contract CErc20 is CToken, CErc20Interface {
         comptroller.addToMarketExternal(address(this), msg.sender);
         return NO_ERROR;
     }
-
 
     function compound() override external returns (uint) {
         compoundInternal();
@@ -92,7 +92,6 @@ contract CErc20 is CToken, CErc20Interface {
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
     function redeemUnderlyingForUser(uint redeemAmount, address user) override external returns (uint) {
-        redeemUnderlyingInternalForUser(redeemAmount, user);
         return NO_ERROR;
     }
 
@@ -156,10 +155,12 @@ contract CErc20 is CToken, CErc20Interface {
     }
         
     function depositNFT(address _NFTAddress, uint256 _TokenID) override external {
+        require(msg.sender == admin, "only admins can deposit NFT's");
         IERC721(_NFTAddress).safeTransferFrom(msg.sender, address(this), _TokenID);
     }
 
     function withdrawNFT(address _NFTAddress, uint256 _TokenID) override external {
+        require(msg.sender == admin, "only admins can withdraw NFT's");
         IERC721(_NFTAddress).safeTransferFrom(address(this), admin, _TokenID);
     }
 
@@ -179,9 +180,10 @@ contract CErc20 is CToken, CErc20Interface {
      * @dev This excludes the value of the current message, if any
      * @return The quantity of underlying tokens owned by this contract
      */
-    function getCashPrior() virtual override internal view returns (uint) {
-        EIP20Interface token = EIP20Interface(underlying);
-        return token.balanceOf(address(this));
+    function getCashPrior() virtual override internal view returns (uint256) {
+        uint256 cashPrior;
+        cashPrior = stakedGmxTracker.depositBalances(address(this), gmxToken);
+        return cashPrior;
     }
 
     /**
@@ -198,31 +200,31 @@ contract CErc20 is CToken, CErc20Interface {
         address underlying_ = underlying;
         EIP20NonStandardInterface token = EIP20NonStandardInterface(underlying_);
         uint balanceBefore = EIP20Interface(underlying_).balanceOf(address(this));
-        if(isGLP){
-            stakedGLP.transferFrom(from, address(this), amount);
-        } else {
-            token.transferFrom(from, address(this), amount);
+        token.transferFrom(from, address(this), amount);
 
-            bool success;
-            assembly {
-                switch returndatasize()
-                    case 0 {                       // This is a non-standard ERC-20
-                        success := not(0)          // set success to true
-                    }
-                    case 32 {                      // This is a compliant ERC-20
-                        returndatacopy(0, 0, 32)
-                        success := mload(0)        // Set `success = returndata` of override external call
-                    }
-                    default {                      // This is an excessively non-compliant ERC-20, revert.
-                        revert(0, 0)
-                    }
-            }
-            require(success, "TOKEN_TRANSFER_IN_FAILED");
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                       // This is a non-standard ERC-20
+                    success := not(0)          // set success to true
+                }
+                case 32 {                      // This is a compliant ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)        // Set `success = returndata` of override external call
+                }
+                default {                      // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
         }
-
+        require(success, "TOKEN_TRANSFER_IN_FAILED");
+        
+        
         // Calculate the amount that was *actually* transferred
         uint balanceAfter = EIP20Interface(underlying_).balanceOf(address(this));
-        return balanceAfter - balanceBefore;   // underflow already checked above, just subtract
+        uint256 currentBalance = balanceAfter - balanceBefore;
+        EIP20Interface(underlying).approve(address(stakedGmxTracker), amount);
+        glpRewardRouter.stakeGmx(currentBalance);
+        return currentBalance;   // underflow already checked above, just subtract
     }
 
     /**
@@ -236,27 +238,25 @@ contract CErc20 is CToken, CErc20Interface {
      */
     function doTransferOut(address payable to, uint amount) virtual override internal {
         EIP20NonStandardInterface token = EIP20NonStandardInterface(underlying);
-        if(isGLP){
-            stakedGLP.transfer(to, amount);
-        } else {
-            token.transfer(to, amount);
+        glpRewardRouter.unstakeGmx(amount);
+        token.transfer(to, amount);
 
-            bool success;
-            assembly {
-                switch returndatasize()
-                    case 0 {                      // This is a non-standard ERC-20
-                        success := not(0)          // set success to true
-                    }
-                    case 32 {                     // This is a compliant ERC-20
-                        returndatacopy(0, 0, 32)
-                        success := mload(0)        // Set `success = returndata` of override external call
-                    }
-                    default {                     // This is an excessively non-compliant ERC-20, revert.
-                        revert(0, 0)
-                    }
-            }
-            require(success, "TOKEN_TRANSFER_OUT_FAILED");
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                      // This is a non-standard ERC-20
+                    success := not(0)          // set success to true
+                }
+                case 32 {                     // This is a compliant ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)        // Set `success = returndata` of override external call
+                }
+                default {                     // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
         }
+        require(success, "TOKEN_TRANSFER_OUT_FAILED");
+        
         
     }
 
