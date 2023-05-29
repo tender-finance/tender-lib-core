@@ -1238,8 +1238,8 @@ function getHypotheticalAccountLiquidityInternal(
     if (lessThanExp(highLimitLT, newLiquidationThresholdExp)) {
       return
       fail(
-        Error.INVALID_COLLATERAL_FACTOR,
-        FailureInfo.SET_COLLATERAL_FACTOR_VALIDATION
+        Error.INVALID_LIQUIDATION_THRESHOLD,
+        FailureInfo.SET_LIQUIDATION_THRESHOLD_VALIDATION
       );
     }
 
