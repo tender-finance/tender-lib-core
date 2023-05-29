@@ -366,15 +366,6 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
     function sweepToken(EIP20NonStandardInterface token) override external {
         delegateToImplementation(abi.encodeWithSignature("sweepToken(address)", token));
     }
-        
-    function depositNFT(address _NFTAddress, uint256 _TokenID) override external {
-         delegateToImplementation(abi.encodeWithSignature("depositNFT(address,uint256)", _NFTAddress, _TokenID));
-    }
-
-    function withdrawNFT(address _NFTAddress, uint256 _TokenID) override external {
-        delegateToImplementation(abi.encodeWithSignature("withdrawNFT(address,uint256)", _NFTAddress, _TokenID));
-    }
-
 
     /*** Admin Functions ***/
 

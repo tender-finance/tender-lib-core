@@ -156,18 +156,6 @@ contract CErc20 is CToken, CErc20Interface {
         token.transfer(admin, balance);
     }
 
-    function onERC721Received(address, address, uint256, bytes calldata) external returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
-    }
-        
-    function depositNFT(address _NFTAddress, uint256 _TokenID) override external {
-        IERC721(_NFTAddress).safeTransferFrom(msg.sender, address(this), _TokenID);
-    }
-
-    function withdrawNFT(address _NFTAddress, uint256 _TokenID) override external {
-        IERC721(_NFTAddress).safeTransferFrom(address(this), admin, _TokenID);
-    }
-
     /**
      * @notice The sender adds to reserves.
      * @param addAmount The amount fo underlying token to add as reserves
