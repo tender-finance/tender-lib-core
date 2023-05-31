@@ -1409,9 +1409,10 @@ function getHypotheticalAccountLiquidityInternal(
     * @notice Set the given borrow caps for the given cToken markets. Borrowing that brings total borrows to or above borrow cap will revert.
     * @dev Admin or borrowCapGuardian function to set the borrow caps. A borrow cap of 0 corresponds to unlimited borrowing.
     * @param cTokens The addresses of the markets (tokens) to change the borrow caps for
-  * @param newBorrowCaps The new borrow cap values in underlying to be set. A value of 0 corresponds to unlimited borrowing.
+    * @param newBorrowCaps The new borrow cap values in underlying to be set. A value of 0 corresponds to unlimited borrowing.
+    * @param newSupplyCaps The new supply cap values in underlying to be set. A value of 0 corresponds to unlimited supplying.
     */
-  function _setMarketBorrowCaps(
+  function _setMarketBorrowAndSupplyCaps(
     CToken[] calldata cTokens,
     uint256[] calldata newBorrowCaps,
     uint256[] calldata newSupplyCaps
