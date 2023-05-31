@@ -1215,9 +1215,14 @@ function getHypotheticalAccountLiquidityInternal(
       );
     }   
 
-    require(newCollateralFactorMantissa <= newCollateralFactorMantissaVip, "collateral factor cannot be greater than vip");
-    require(newLiquidationThresholdMantissa <= newLiquidationThresholdMantissaVip, "liquidation threshold cannot be greater than vip");
-    require(newCollateralFactorMantissaVip <= newLiquidationThresholdMantissaVip, "Collateral factor must be lower than liquidation threshold");
+    bool valid = newCollateralFactorMantissa <= newLiquidationThresholdMantissa
+        && newCollateralFactorMantissaVip <=  newLiquidationThresholdMantissaVip
+        && newCollateralFactorMantissa <= newCollateralFactorMantissaVip
+        && newLiquidationThresholdMantissa <= newLiquidationThresholdMantissaVip;
+    require(
+        valid,
+        "Invalid Parameters"
+    );
 
     // Verify market is listed
     Market storage market = markets[address(cToken)];
