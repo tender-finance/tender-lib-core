@@ -25,8 +25,8 @@ interface IComptroller {
   function borrowVerify(address cToken, address borrower, uint borrowAmount) external;
   function getIsAccountVip(address account) external view returns (bool);
   function getAllMarkets() external view returns (address[] memory);
-  function getAccountLiquidity(address account) external view returns (uint, uint, uint);
-  function getHypotheticalAccountLiquidity(address account, address cTokenModify, uint redeemTokens, uint borrowAmount) external view returns (uint, uint, uint);
+  function getAccountLiquidity(address account, bool isLiquidationCheck) external view returns (uint, uint, uint);
+  function getHypotheticalAccountLiquidity(address account, address cTokenModify, uint redeemTokens, uint borrowAmount, bool isLiquidationCheck) external view returns (uint, uint, uint);
   function _setPriceOracle(address oracle_) external;
   function _supportMarket(address delegator, bool isComped, bool isPrivate, bool onlyWhitelistedBorrow) external;
   function _setFactorsAndThresholds(address delegator, uint collateralFactor, uint collateralVIP, uint threshold, uint thresholdVIP) external;
