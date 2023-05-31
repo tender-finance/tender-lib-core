@@ -362,7 +362,7 @@ uint256 mintAmount
   uint256 supplyCap = supplyCaps[cToken];
   // Borrow cap of 0 corresponds to unlimited borrowing
   if (supplyCaps[cToken] != 0) {
-    uint256 totalDeposits = CToken(cToken).totalBorrows() + CToken(cToken).getCash() + CToken(cToken).totalReserves();
+    uint256 totalDeposits = add_(CToken(cToken).totalBorrows(),CToken(cToken).getCash());
     uint256 nextTotalDeposit = add_(totalDeposits, mintAmount);
     require(nextTotalDeposit < supplyCap, "supply cap reached");
   }
