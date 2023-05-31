@@ -21,7 +21,8 @@ contract ComptrollerErrorReporter {
         SNAPSHOT_ERROR,
         TOO_MANY_ASSETS,
         TOO_MUCH_REPAY,
-        CANNOT_BORROW_ASSET
+        CANNOT_BORROW_ASSET,
+        INVALID_LIQUIDATION_THRESHOLD
     }
 
     enum FailureInfo {
@@ -44,7 +45,8 @@ contract ComptrollerErrorReporter {
         SET_PRICE_ORACLE_OWNER_CHECK,
         SUPPORT_MARKET_EXISTS,
         SUPPORT_MARKET_OWNER_CHECK,
-        SET_PAUSE_GUARDIAN_OWNER_CHECK
+        SET_PAUSE_GUARDIAN_OWNER_CHECK,
+        SET_LIQUIDATION_THRESHOLD_VALIDATION
     }
 
     /**
