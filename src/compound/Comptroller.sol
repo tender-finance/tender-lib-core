@@ -210,7 +210,8 @@ external
 override
 {
   require(msg.sender == cToken, "not cToken");
-  addToMarketInternal(CToken(cToken), borrower);
+  Error err = addToMarketInternal(CToken(cToken), borrower);
+  require(err == Error.NO_ERROR, 'Failed to add market');
 }
 
 /**
