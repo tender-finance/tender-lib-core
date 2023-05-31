@@ -899,7 +899,7 @@ struct oldFactorsAndThresholds {
            account liquidity in excess of collateral requirements,
            *          account shortfall below collateral requirements)
            */
-function getAccountLiquidity(address account, bool isLiquidationCheck)
+function getAccountLiquidity(address account)
 public
 view
 returns (
@@ -916,7 +916,7 @@ returns (
   CToken(address(0)),
   0,
   0,
-  isLiquidationCheck
+  true
   );
 
   return (uint256(err), liquidity, shortfall);
@@ -980,8 +980,7 @@ function getHypotheticalAccountLiquidity(
   address account,
   address cTokenModify,
   uint256 redeemTokens,
-  uint256 borrowAmount,
-  bool isLiquidationCheck
+  uint256 borrowAmount
 )
 public
 view
@@ -1000,7 +999,7 @@ returns (
   CToken(cTokenModify),
   redeemTokens,
   borrowAmount,
-  isLiquidationCheck
+  false
   );
   return (uint256(err), liquidity, shortfall);
 }
