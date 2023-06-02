@@ -5,9 +5,10 @@ import {SafeMath} from 'oz/utils/math/SafeMath.sol';
 import {Ownable} from 'oz/access/Ownable.sol';
 import {ICToken} from '../external/compound/ICToken.sol';
 import {IChainlinkPriceOracle} from '../external/oracle/IChainlinkPriceOracle.sol';
+import {ITenderPriceOracle} from '../external/oracle/ITenderPriceOracle.sol';
 import {IERC20Metadata as IERC20} from "oz/interfaces/IERC20Metadata.sol";
 
-contract TenderPriceOracle is Ownable {
+contract TenderPriceOracle is ITenderPriceOracle, Ownable {
   using SafeMath for uint256;
   ICToken public constant tETH = ICToken(0x0706905b2b21574DEFcF00B5fc48068995FCdCdf);
   IERC20 public constant WETH = IERC20(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);

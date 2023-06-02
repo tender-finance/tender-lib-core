@@ -27,11 +27,11 @@ contract GlpPriceOracle is IChainlinkPriceOracle {
   }
 
   function getGlpPrice() public view returns (int) {
-    return int(getGlpAum(false).mul(1e8).div(getGlpSupply()));
+    return int(getGlpAum(false).mul(1e18).div(getGlpSupply()));
   }
 
   function decimals() public pure returns (uint8) {
-    return 8;
+    return 18;
   }
 
   function latestRoundData() public view returns (
