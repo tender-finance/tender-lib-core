@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.8.0;
 
-import {IComptroller} from '../../src/external/compound/Comptroller.sol';
-import {ICToken} from '../../src/external/compound/ICToken.sol';
-import {Addresses} from '../shared/Addresses.sol';
-import {TenderPriceOracle} from '../../src/oracle/TenderPriceOracle.sol';
+import {IComptroller} from "../../src/external/compound/Comptroller.sol";
+import {ICToken} from "../../src/external/compound/ICToken.sol";
+import {Addresses} from "../shared/Addresses.sol";
+import {TenderPriceOracle} from "../../src/oracle/TenderPriceOracle.sol";
 import {ITenderPriceOracle} from "../../src/external/oracle/ITenderPriceOracle.sol";
-import {GlpPriceOracle} from '../../src/oracle/GlpPriceOracle.sol';
+import {GlpPriceOracle} from "../../src/oracle/GlpPriceOracle.sol";
 import {IERC20Metadata as IERC20} from "oz/interfaces/IERC20Metadata.sol";
-import {GMDPriceFeedFactory} from '../../src/oracle/GMDPriceOracle.sol';
+import {GMDPriceFeedFactory} from "../../src/oracle/GMDPriceOracle.sol";
 
 library DeployOracle {
   function deploy() public returns (ITenderPriceOracle oracle) {
@@ -26,7 +26,7 @@ library DeployOracle {
       0x80aEFB7dAde25542cc2f558Ee605aC2FC974Ceb9
     ];
 
-    for(uint i=0; i < gmdCTokens.length; i++) {
+    for (uint256 i = 0; i < gmdCTokens.length; i++) {
       IERC20 underlying = ICToken(gmdCTokens[i]).underlying();
       oracle.setOracle(underlying, factory.getGMDPriceFeed(address(underlying)));
     }

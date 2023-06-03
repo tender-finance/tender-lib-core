@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {IGlpManager} from './IGlpManager.sol';
+import {IGlpManager} from "./IGlpManager.sol";
 
 interface IRewardTracker {
   function balanceOf(address _account) external view returns (uint256);
@@ -20,4 +20,3 @@ interface IRewardTracker {
   function averageStakedAmounts(address _account) external view returns (uint256);
   function cumulativeRewards(address _account) external view returns (uint256);
 }
-

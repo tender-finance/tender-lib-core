@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.10;
 
-import {SafeMath} from 'oz/utils/math/SafeMath.sol';
+import {SafeMath} from "oz/utils/math/SafeMath.sol";
 import {IERC20Metadata as IERC20} from "oz/interfaces/IERC20Metadata.sol";
-import {IGlpManager} from '../external/gmx/IGlpManager.sol';
-import {IGmxVault} from '../external/gmx/IGmxVault.sol';
-import {IChainlinkPriceOracle} from '../external/oracle/IChainlinkPriceOracle.sol';
+import {IGlpManager} from "../external/gmx/IGlpManager.sol";
+import {IGmxVault} from "../external/gmx/IGmxVault.sol";
+import {IChainlinkPriceOracle} from "../external/oracle/IChainlinkPriceOracle.sol";
 
 contract GlpPriceOracle is IChainlinkPriceOracle {
   using SafeMath for uint256;
@@ -14,33 +14,31 @@ contract GlpPriceOracle is IChainlinkPriceOracle {
   IGlpManager public immutable glpManager = IGlpManager(0x321F653eED006AD1C29D174e17d96351BDe22649);
   IGmxVault public glpVault = IGmxVault(0x489ee077994B6658eAfA855C308275EAd8097C4A);
 
-  function getVaultPercentageCurrent(address token) public view returns (uint){
+  function getVaultPercentageCurrent(address token) public view returns (uint256) {
     return glpVault.usdgAmounts(token).mul(1e18).div(getGlpAum(true));
   }
 
-  function getGlpSupply() public view returns (uint) {
+  function getGlpSupply() public view returns (uint256) {
     return glpToken.totalSupply();
   }
 
-  function getGlpAum(bool maximize) public view returns (uint) {
+  function getGlpAum(bool maximize) public view returns (uint256) {
     return glpManager.getAumInUsdg(maximize);
   }
 
-  function getGlpPrice() public view returns (int) {
-    return int(getGlpAum(false).mul(1e18).div(getGlpSupply()));
+  function getGlpPrice() public view returns (int256) {
+    return int256(getGlpAum(false).mul(1e18).div(getGlpSupply()));
   }
 
   function decimals() public pure returns (uint8) {
     return 18;
   }
 
-  function latestRoundData() public view returns (
-    uint80 roundId,
-    int256 answer,
-    uint256 startedAt,
-    uint256 updatedAt,
-    uint80 answeredInRound
-  ) {
+  function latestRoundData()
+    public
+    view
+    returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)
+  {
     return (0, getGlpPrice(), 0, 0, 0);
   }
 }
