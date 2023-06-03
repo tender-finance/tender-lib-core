@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.10;
 
-import {SafeMath} from 'oz/utils/math/SafeMath.sol';
+import {SafeMath} from "oz/utils/math/SafeMath.sol";
 import {IERC20Metadata as IERC20} from "oz/interfaces/IERC20Metadata.sol";
-import {IChainlinkPriceOracle} from '../external/oracle/IChainlinkPriceOracle.sol';
+import {IChainlinkPriceOracle} from "../external/oracle/IChainlinkPriceOracle.sol";
 
 interface IGMDVault {
-  function GDpriceToStakedtoken (uint id) external view returns (uint);
+  function GDpriceToStakedtoken(uint256 id) external view returns (uint256);
 }
 
 interface IGMDPriceFeed {
@@ -15,11 +15,11 @@ interface IGMDPriceFeed {
 }
 
 contract GMDPriceFeedFactory {
-  mapping(uint => address) public idAssets;
-  mapping(address => uint) public assetIds;
-  mapping(uint => IChainlinkPriceOracle) underlyingOracles;
+  mapping(uint256 => address) public idAssets;
+  mapping(address => uint256) public assetIds;
+  mapping(uint256 => IChainlinkPriceOracle) underlyingOracles;
   mapping(IERC20 => IERC20) underlyings;
-  mapping(address => GMDPriceFeed) public gmdPriceFeeds; 
+  mapping(address => GMDPriceFeed) public gmdPriceFeeds;
   IGMDVault public gmdVault = IGMDVault(0x8080B5cE6dfb49a6B86370d6982B3e2A86FBBb08);
 
   constructor() {
@@ -38,32 +38,29 @@ contract GMDPriceFeedFactory {
     underlyingOracles[2] = IChainlinkPriceOracle(0x6ce185860a4963106506C203335A2910413708e9);
     underlyingOracles[4] = IChainlinkPriceOracle(0x3f3f5dF88dC9F13eac63DF89EC16ef6e7E25DdE7);
 
-    for(uint i = 0; i < 5; i++) {
+    for (uint256 i = 0; i < 5; i++) {
       if (idAssets[i] != address(0)) {
         GMDPriceFeed gmdPriceFeed = new GMDPriceFeed(gmdVault, i, IERC20(idAssets[i]), underlyingOracles[i]);
-        gmdPriceFeeds[idAssets[i]] = gmdPriceFeed; 
+        gmdPriceFeeds[idAssets[i]] = gmdPriceFeed;
       }
     }
   }
+
   function getGMDPriceFeed(address _asset) public view returns (GMDPriceFeed) {
     return gmdPriceFeeds[_asset];
   }
 }
 
 contract GMDPriceFeed is IChainlinkPriceOracle {
-  using SafeMath for uint;
+  using SafeMath for uint256;
+
   IGMDVault public gmdVault;
   IERC20 public gmdTokenAddr;
   IERC20 public underlyingAddress;
   IChainlinkPriceOracle public underlyingOracle;
-  uint public gmdTokenId;
+  uint256 public gmdTokenId;
 
-  constructor(
-    IGMDVault _gmdVault,
-    uint _gmdTokenId,
-    IERC20 _gmdTokenAddr,
-    IChainlinkPriceOracle _underlyingOracle
-  ) {
+  constructor(IGMDVault _gmdVault, uint256 _gmdTokenId, IERC20 _gmdTokenAddr, IChainlinkPriceOracle _underlyingOracle) {
     gmdVault = _gmdVault;
     gmdTokenId = _gmdTokenId;
     gmdTokenAddr = _gmdTokenAddr;
@@ -71,11 +68,11 @@ contract GMDPriceFeed is IChainlinkPriceOracle {
   }
 
   function latestRoundData() public view returns (uint80, int256, uint256, uint256, uint80) {
-    uint priceInUnderlying = gmdVault.GDpriceToStakedtoken(gmdTokenId);
-    (, int _answer, , ,) = underlyingOracle.latestRoundData();
-    require(_answer > 0, 'Oracle Error');
-    int answer = int(priceInUnderlying.mul(uint(_answer)).div(10**underlyingOracle.decimals()));
-    return (0, int(answer), 0, 0, 0);
+    uint256 priceInUnderlying = gmdVault.GDpriceToStakedtoken(gmdTokenId);
+    (, int256 _answer,,,) = underlyingOracle.latestRoundData();
+    require(_answer > 0, "Oracle Error");
+    int256 answer = int256(priceInUnderlying.mul(uint256(_answer)).div(10 ** underlyingOracle.decimals()));
+    return (0, int256(answer), 0, 0, 0);
   }
 
   function decimals() public pure returns (uint8) {

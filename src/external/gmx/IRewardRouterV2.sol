@@ -18,10 +18,13 @@ interface IRewardRouterV2 {
     bool _shouldConvertWethToEth
   ) external;
   function signalTransfer(address _receiver) external;
-  function mintAndStakeGlp(address _token, uint256 _amount, uint256 _minUsdg, uint256 _minGlp) external returns (uint256);
+  function mintAndStakeGlp(address _token, uint256 _amount, uint256 _minUsdg, uint256 _minGlp)
+    external
+    returns (uint256);
   function mintAndStakeGlpETH(uint256 _minUsdg, uint256 _minGlp) external payable returns (uint256);
   function stakeGmx(uint256 amount) external;
   function unstakeGmx(uint256 amount) external;
-   function unstakeAndRedeemGlp(address _tokenOut, uint256 _glpAmount, uint256 _minOut, address _receiver) external returns (uint256);
+  function unstakeAndRedeemGlp(address _tokenOut, uint256 _glpAmount, uint256 _minOut, address _receiver)
+    external
+    returns (uint256);
 }
-

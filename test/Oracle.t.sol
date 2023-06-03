@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.8.0;
 
-import {IComptroller} from '../src/external/compound/Comptroller.sol';
-import {ICToken} from '../src/external/compound/ICToken.sol';
-import {Addresses} from '../script/shared/Addresses.sol';
+import {IComptroller} from "../src/external/compound/Comptroller.sol";
+import {ICToken} from "../src/external/compound/ICToken.sol";
+import {Addresses} from "../script/shared/Addresses.sol";
 import {ITenderPriceOracle} from "../src/external/oracle/ITenderPriceOracle.sol";
-import {GlpPriceOracle} from '../src/oracle/GlpPriceOracle.sol';
+import {GlpPriceOracle} from "../src/oracle/GlpPriceOracle.sol";
 import {IERC20Metadata as IERC20} from "oz/interfaces/IERC20Metadata.sol";
-import {GMDPriceFeedFactory} from '../src/oracle/GMDPriceOracle.sol';
-import {DeployOracle} from '../script/deploy/DeployOracle.sol';
-import {Test} from 'forge-std/Test.sol';
+import {GMDPriceFeedFactory} from "../src/oracle/GMDPriceOracle.sol";
+import {DeployOracle} from "../script/deploy/DeployOracle.sol";
+import {Test} from "forge-std/Test.sol";
 
 contract TestOracle is Test {
   IComptroller comptroller = IComptroller(Addresses.unitroller);
@@ -37,7 +37,6 @@ contract TestOracle is Test {
     0x80aEFB7dAde25542cc2f558Ee605aC2FC974Ceb9
   ];
 
-
   function setUp() public {
     vm.deal(admin, 1 ether);
     vm.startPrank(admin, admin);
@@ -49,13 +48,13 @@ contract TestOracle is Test {
     address[] memory _markets = markets;
     ITenderPriceOracle oldOracle = ITenderPriceOracle(comptroller.oracle());
 
-    for(uint i=0; i < _markets.length; i++) {
+    for (uint256 i = 0; i < _markets.length; i++) {
       ICToken cToken = ICToken(_markets[i]);
-      uint newPrice = oracle.getUnderlyingPrice(cToken);
-      uint oldPrice = oldOracle.getUnderlyingPrice(cToken);
+      uint256 newPrice = oracle.getUnderlyingPrice(cToken);
+      uint256 oldPrice = oldOracle.getUnderlyingPrice(cToken);
 
-      (uint lower, uint higher) = (newPrice <= oldPrice) ? (newPrice, oldPrice) : (oldPrice, newPrice);
-      uint percentSimilar = (lower * 100)/higher;
+      (uint256 lower, uint256 higher) = (newPrice <= oldPrice) ? (newPrice, oldPrice) : (oldPrice, newPrice);
+      uint256 percentSimilar = (lower * 100) / higher;
       // require less than 1% deviation
       assertGe(percentSimilar, 99);
     }

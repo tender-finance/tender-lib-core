@@ -16,9 +16,7 @@ interface ICToken is IERC20 {
   function mint(uint256 mintAmount) external returns (uint256);
   function redeem(uint256 redeemTokens) external returns (uint256);
   function redeemForAccount(address account, uint256 redeemTokens) external returns (uint256);
-  function redeemUnderlyingForAccount(address account, uint256 redeemAmount)
-    external
-    returns (uint256);
+  function redeemUnderlyingForAccount(address account, uint256 redeemAmount) external returns (uint256);
 
   function redeemUnderlying(uint256 redeemAmount) external returns (uint256);
   function redeemUnderlyingForUser(uint256 redeemAmount, address user) external returns (uint256);
@@ -27,9 +25,7 @@ interface ICToken is IERC20 {
   function repayForAccount(address borrower, uint256 repayAmount) external returns (uint256);
   function repayBorrow(uint256 repayAmount) external returns (uint256);
   function repayBorrowBehalf(address borrower, uint256 repayAmount) external returns (uint256);
-  function liquidateBorrow(address borrower, uint256 repayAmount, address cTokenCollateral)
-    external
-    returns (uint256);
+  function liquidateBorrow(address borrower, uint256 repayAmount, address cTokenCollateral) external returns (uint256);
   function depositNFT(address _NFTAddress, uint256 _TokenID) external;
   function withdrawNFT(address _NFTAddress, uint256 _TokenID) external;
   function compound() external returns (uint256);
@@ -76,34 +72,18 @@ interface ICToken is IERC20 {
   function withdrawFeeMAX() external view returns (uint256);
   function autoCompoundBlockThreshold() external view returns (uint256);
 
-  event AccrueInterest(
-    uint256 cashPrior, uint256 interestAccumulated, uint256 borrowIndex, uint256 totalBorrows
-  );
+  event AccrueInterest(uint256 cashPrior, uint256 interestAccumulated, uint256 borrowIndex, uint256 totalBorrows);
   event Mint(address minter, uint256 mintAmount, uint256 mintTokens);
   event Redeem(address redeemer, uint256 redeemAmount, uint256 redeemTokens);
-  event Borrow(
-    address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows
-  );
-  event RepayBorrow(
-    address payer,
-    address borrower,
-    uint256 repayAmount,
-    uint256 accountBorrows,
-    uint256 totalBorrows
-  );
+  event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows);
+  event RepayBorrow(address payer, address borrower, uint256 repayAmount, uint256 accountBorrows, uint256 totalBorrows);
   event LiquidateBorrow(
-    address liquidator,
-    address borrower,
-    uint256 repayAmount,
-    address cTokenCollateral,
-    uint256 seizeTokens
+    address liquidator, address borrower, uint256 repayAmount, address cTokenCollateral, uint256 seizeTokens
   );
   event NewPendingAdmin(address oldPendingAdmin, address newPendingAdmin);
   event NewAdmin(address oldAdmin, address newAdmin);
   event NewComptroller(IComptroller oldComptroller, IComptroller newComptroller);
-  event NewMarketInterestRateModel(
-    InterestRateModel oldInterestRateModel, InterestRateModel newInterestRateModel
-  );
+  event NewMarketInterestRateModel(InterestRateModel oldInterestRateModel, InterestRateModel newInterestRateModel);
   event NewReserveFactor(uint256 oldReserveFactorMantissa, uint256 newReserveFactorMantissa);
   event ReservesAdded(address benefactor, uint256 addAmount, uint256 newTotalReserves);
   event ReservesReduced(address admin, uint256 reduceAmount, uint256 newTotalReserves);
@@ -114,10 +94,7 @@ interface ICToken is IERC20 {
   function allowance(address owner, address spender) external view returns (uint256);
   function balanceOf(address owner) external view returns (uint256);
   function balanceOfUnderlying(address owner) external returns (uint256);
-  function getAccountSnapshot(address account)
-    external
-    view
-    returns (uint256, uint256, uint256, uint256);
+  function getAccountSnapshot(address account) external view returns (uint256, uint256, uint256, uint256);
   function borrowRatePerBlock() external view returns (uint256);
   function supplyRatePerBlock() external view returns (uint256);
   function totalBorrowsCurrent() external returns (uint256);
@@ -127,9 +104,7 @@ interface ICToken is IERC20 {
   function exchangeRateStored() external view returns (uint256);
   function getCash() external view returns (uint256);
   function accrueInterest() external returns (uint256);
-  function seize(address liquidator, address borrower, uint256 seizeTokens)
-    external
-    returns (uint256);
+  function seize(address liquidator, address borrower, uint256 seizeTokens) external returns (uint256);
 
   /**
    * Admin Functions **
