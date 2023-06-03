@@ -15,6 +15,7 @@ interface IStakedGlp {
   function glpManager() external view returns (address);
   function stakedGlpTracker() external view returns (address);
   function feeGlpTracker() external view returns (address);
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }

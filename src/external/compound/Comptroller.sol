@@ -2,49 +2,64 @@
 pragma solidity ^0.8.10;
 
 interface IComptroller {
-  function isComptroller () external view returns (bool);
+  function isComptroller() external view returns (bool);
   function oracle() external view returns (address);
-  function markets(address) external view returns (
-    bool isListed,
-    uint collateralFactorMantissa,
-    uint liquidationThresholdMantissa,
-    uint collateralFactorMantissaVip,
-    uint liquidationThresholdMantissaVip,
-    bool isComped,
-    bool isPrivate,
-    bool onlyWhitelistedBorrow
-  );
-  function enterMarkets(address[] calldata cTokens) external returns (uint[] memory);
-  function exitMarket(address cToken) external returns (uint);
+  function markets(address)
+    external
+    view
+    returns (
+      bool isListed,
+      uint256 collateralFactorMantissa,
+      uint256 liquidationThresholdMantissa,
+      uint256 collateralFactorMantissaVip,
+      uint256 liquidationThresholdMantissaVip,
+      bool isComped,
+      bool isPrivate,
+      bool onlyWhitelistedBorrow
+    );
+  function enterMarkets(address[] calldata cTokens) external returns (uint256[] memory);
+  function exitMarket(address cToken) external returns (uint256);
   function addToMarketExternal(address cToken, address borrower) external;
-  function mintAllowed(address cToken, address minter, uint mintAmount) external returns (uint);
-  function mintVerify(address cToken, address minter, uint mintAmount, uint mintTokens) external;
-  function redeemAllowed(address cToken, address redeemer, uint redeemTokens) external returns (uint);
-  function redeemVerify(address cToken, address redeemer, uint redeemAmount, uint redeemTokens) external;
-  function borrowAllowed(address cToken, address borrower, uint borrowAmount) external returns (uint);
-  function borrowVerify(address cToken, address borrower, uint borrowAmount) external;
+  function mintAllowed(address cToken, address minter, uint256 mintAmount) external returns (uint256);
+  function mintVerify(address cToken, address minter, uint256 mintAmount, uint256 mintTokens) external;
+  function redeemAllowed(address cToken, address redeemer, uint256 redeemTokens) external returns (uint256);
+  function redeemVerify(address cToken, address redeemer, uint256 redeemAmount, uint256 redeemTokens) external;
+  function borrowAllowed(address cToken, address borrower, uint256 borrowAmount) external returns (uint256);
+  function borrowVerify(address cToken, address borrower, uint256 borrowAmount) external;
   function getIsAccountVip(address account) external view returns (bool);
   function getAllMarkets() external view returns (address[] memory);
-  function getAccountLiquidity(address account, bool isLiquidationCheck) external view returns (uint, uint, uint);
-  function getHypotheticalAccountLiquidity(address account, address cTokenModify, uint redeemTokens, uint borrowAmount, bool isLiquidationCheck) external view returns (uint, uint, uint);
+  function getAccountLiquidity(address account, bool isLiquidationCheck)
+    external
+    view
+    returns (uint256, uint256, uint256);
+  function getHypotheticalAccountLiquidity(
+    address account,
+    address cTokenModify,
+    uint256 redeemTokens,
+    uint256 borrowAmount,
+    bool isLiquidationCheck
+  ) external view returns (uint256, uint256, uint256);
   function _setPriceOracle(address oracle_) external;
   function _supportMarket(address delegator, bool isComped, bool isPrivate, bool onlyWhitelistedBorrow) external;
-  function _setFactorsAndThresholds(address delegator, uint collateralFactor, uint collateralVIP, uint threshold, uint thresholdVIP) external;
+  function _setFactorsAndThresholds(
+    address delegator,
+    uint256 collateralFactor,
+    uint256 collateralVIP,
+    uint256 threshold,
+    uint256 thresholdVIP
+  ) external;
 
-    /// @notice Indicator that this is a Comptroller contract (for inspection)
-  function repayBorrowAllowed(
-    address cToken,
-    address payer,
-    address borrower,
-    uint repayAmount
-  ) external returns (uint);
+  /// @notice Indicator that this is a Comptroller contract (for inspection)
+  function repayBorrowAllowed(address cToken, address payer, address borrower, uint256 repayAmount)
+    external
+    returns (uint256);
 
   function repayBorrowVerify(
     address cToken,
     address payer,
     address borrower,
-    uint repayAmount,
-    uint borrowerIndex
+    uint256 repayAmount,
+    uint256 borrowerIndex
   ) external;
 
   function liquidateBorrowAllowed(
@@ -52,15 +67,15 @@ interface IComptroller {
     address cTokenCollateral,
     address liquidator,
     address borrower,
-    uint repayAmount
-  ) external returns (uint);
+    uint256 repayAmount
+  ) external returns (uint256);
   function liquidateBorrowVerify(
     address cTokenBorrowed,
     address cTokenCollateral,
     address liquidator,
     address borrower,
-    uint repayAmount,
-    uint seizeTokens
+    uint256 repayAmount,
+    uint256 seizeTokens
   ) external;
 
   function seizeAllowed(
@@ -68,34 +83,25 @@ interface IComptroller {
     address cTokenBorrowed,
     address liquidator,
     address borrower,
-    uint seizeTokens
-  ) external returns (uint);
+    uint256 seizeTokens
+  ) external returns (uint256);
 
   function seizeVerify(
     address cTokenCollateral,
     address cTokenBorrowed,
     address liquidator,
     address borrower,
-    uint seizeTokens
+    uint256 seizeTokens
   ) external;
-  function transferAllowed(
-    address cToken,
-    address src,
-    address dst,
-    uint transferTokens
-  ) external returns (uint);
+  function transferAllowed(address cToken, address src, address dst, uint256 transferTokens) external returns (uint256);
 
-  function transferVerify(
-    address cToken,
-    address src,
-    address dst,
-    uint transferTokens
-  ) external;
+  function transferVerify(address cToken, address src, address dst, uint256 transferTokens) external;
 
-  /*** Liquidity/Liquidation Calculations ***/
-  function liquidateCalculateSeizeTokens(
-    address cTokenBorrowed,
-    address cTokenCollateral,
-    uint repayAmount
-  ) external view returns (uint, uint);
+  /**
+   * Liquidity/Liquidation Calculations **
+   */
+  function liquidateCalculateSeizeTokens(address cTokenBorrowed, address cTokenCollateral, uint256 repayAmount)
+    external
+    view
+    returns (uint256, uint256);
 }

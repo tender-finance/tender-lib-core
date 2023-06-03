@@ -47,7 +47,8 @@ interface IGmxVault {
   function setInPrivateLiquidationMode(bool _inPrivateLiquidationMode) external;
   function setLiquidator(address _liquidator, bool _isActive) external;
 
-  function setFundingRate(uint256 _fundingInterval, uint256 _fundingRateFactor, uint256 _stableFundingRateFactor) external;
+  function setFundingRate(uint256 _fundingInterval, uint256 _fundingRateFactor, uint256 _stableFundingRateFactor)
+    external;
 
   function setFees(
     uint256 _taxBasisPoints,
@@ -78,10 +79,36 @@ interface IGmxVault {
   function buyUSDG(address _token, address _receiver) external returns (uint256);
   function sellUSDG(address _token, address _receiver) external returns (uint256);
   function swap(address _tokenIn, address _tokenOut, address _receiver) external returns (uint256);
-  function increasePosition(address _account, address _collateralToken, address _indexToken, uint256 _sizeDelta, bool _isLong) external;
-  function decreasePosition(address _account, address _collateralToken, address _indexToken, uint256 _collateralDelta, uint256 _sizeDelta, bool _isLong, address _receiver) external returns (uint256);
-  function validateLiquidation(address _account, address _collateralToken, address _indexToken, bool _isLong, bool _raise) external view returns (uint256, uint256);
-  function liquidatePosition(address _account, address _collateralToken, address _indexToken, bool _isLong, address _feeReceiver) external;
+  function increasePosition(
+    address _account,
+    address _collateralToken,
+    address _indexToken,
+    uint256 _sizeDelta,
+    bool _isLong
+  ) external;
+  function decreasePosition(
+    address _account,
+    address _collateralToken,
+    address _indexToken,
+    uint256 _collateralDelta,
+    uint256 _sizeDelta,
+    bool _isLong,
+    address _receiver
+  ) external returns (uint256);
+  function validateLiquidation(
+    address _account,
+    address _collateralToken,
+    address _indexToken,
+    bool _isLong,
+    bool _raise
+  ) external view returns (uint256, uint256);
+  function liquidatePosition(
+    address _account,
+    address _collateralToken,
+    address _indexToken,
+    bool _isLong,
+    address _feeReceiver
+  ) external;
   function tokenToUsdMin(address _token, uint256 _tokenAmount) external view returns (uint256);
 
   function priceFeed() external view returns (address);
@@ -89,7 +116,13 @@ interface IGmxVault {
   function stableFundingRateFactor() external view returns (uint256);
   function cumulativeFundingRates(address _token) external view returns (uint256);
   function getNextFundingRate(address _token) external view returns (uint256);
-  function getFeeBasisPoints(address _token, uint256 _usdgDelta, uint256 _feeBasisPoints, uint256 _taxBasisPoints, bool _increment) external view returns (uint256);
+  function getFeeBasisPoints(
+    address _token,
+    uint256 _usdgDelta,
+    uint256 _feeBasisPoints,
+    uint256 _taxBasisPoints,
+    bool _increment
+  ) external view returns (uint256);
 
   function liquidationFeeUsd() external view returns (uint256);
   function taxBasisPoints() external view returns (uint256);
@@ -120,6 +153,12 @@ interface IGmxVault {
   function getMaxPrice(address _token) external view returns (uint256);
   function getMinPrice(address _token) external view returns (uint256);
 
-  function getDelta(address _indexToken, uint256 _size, uint256 _averagePrice, bool _isLong, uint256 _lastIncreasedTime) external view returns (bool, uint256);
-  function getPosition(address _account, address _collateralToken, address _indexToken, bool _isLong) external view returns (uint256, uint256, uint256, uint256, uint256, uint256, bool, uint256);
+  function getDelta(address _indexToken, uint256 _size, uint256 _averagePrice, bool _isLong, uint256 _lastIncreasedTime)
+    external
+    view
+    returns (bool, uint256);
+  function getPosition(address _account, address _collateralToken, address _indexToken, bool _isLong)
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, uint256, uint256, bool, uint256);
 }
