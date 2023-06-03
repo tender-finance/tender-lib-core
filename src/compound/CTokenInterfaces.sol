@@ -7,362 +7,382 @@ import {EIP20NonStandardInterface} from "./EIP20NonStandardInterface.sol";
 import {TokenErrorReporter} from "./ErrorReporter.sol";
 
 contract CTokenStorage {
-    /**
-     * @dev Guard variable for re-entrancy checks
-     */
-    bool internal _notEntered;
+  /**
+   * @dev Guard variable for re-entrancy checks
+   */
+  bool internal _notEntered;
 
-    /**
-     * @notice Is the underlying token GLP
-     */
-    bool public isGLP;
+  /**
+   * @notice Is the underlying token GLP
+   */
+  bool public isGLP;
 
-    /**
-     * @notice Wether or not the eth rewards from glp market should be autocompounded
-     */
-    bool public autocompound;
+  /**
+   * @notice Wether or not the eth rewards from glp market should be autocompounded
+   */
+  bool public autocompound;
 
-    /**
-     * @notice GLP reward router for claiming rewards
-     */
-    address public glpRewardRouter;
+  /**
+   * @notice GLP reward router for claiming rewards
+   */
+  address public glpRewardRouter;
 
-    /**
-     * @notice Staked GLP Adress to call transfer on
-     */
-    address public stakedGLP;
+  /**
+   * @notice Staked GLP Adress to call transfer on
+   */
+  address public stakedGLP;
 
-    /**
-     * @notice address of the GMX token
-     */
-    address public gmxToken;
+  /**
+   * @notice address of the GMX token
+   */
+  address public gmxToken;
 
-    /**
-     * @notice Address that handles GMX staking
-     */
-    address public stakedGmxTracker;
+  /**
+   * @notice Address that handles GMX staking
+   */
+  address public stakedGmxTracker;
 
-    /**
-     * @notice address of the Staked GMX token
-     */
-    address public sbfGMX;
+  /**
+   * @notice address of the Staked GMX token
+   */
+  address public sbfGMX;
 
-    /**
-     * @notice Staked GLP Adress to call transfer on
-     */
-    address public immutable WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
+  /**
+   * @notice Staked GLP Adress to call transfer on
+   */
+  address public immutable WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
 
-    /**
-     * @notice GLP manager contract to approve transfers on for autocompounding
-     */
-    address public glpManager;
+  /**
+   * @notice GLP manager contract to approve transfers on for autocompounding
+   */
+  address public glpManager;
 
-    /**
-     * @notice EIP-20 token name for this token
-     */
-    string public name;
+  /**
+   * @notice EIP-20 token name for this token
+   */
+  string public name;
 
-    /**
-     * @notice EIP-20 token symbol for this token
-     */
-    string public symbol;
+  /**
+   * @notice EIP-20 token symbol for this token
+   */
+  string public symbol;
 
-    /**
-     * @notice EIP-20 token decimals for this token
-     */
-    uint8 public decimals;
+  /**
+   * @notice EIP-20 token decimals for this token
+   */
+  uint8 public decimals;
 
-    // Maximum borrow rate that can ever be applied (.0005% / block)
-    uint internal constant borrowRateMaxMantissa = 0.0005e16;
+  // Maximum borrow rate that can ever be applied (.0005% / block)
+  uint256 internal constant borrowRateMaxMantissa = 0.0005e16;
 
-    // Maximum fraction of interest that can be set aside for reserves
-    uint internal constant reserveFactorMaxMantissa = 1e18;
+  // Maximum fraction of interest that can be set aside for reserves
+  uint256 internal constant reserveFactorMaxMantissa = 1e18;
 
-    /**
-     * @notice Administrator for this contract
-     */
-    address payable public admin;
+  /**
+   * @notice Administrator for this contract
+   */
+  address payable public admin;
 
-    /**
-     * @notice Pending administrator for this contract
-     */
-    address payable public pendingAdmin;
+  /**
+   * @notice Pending administrator for this contract
+   */
+  address payable public pendingAdmin;
 
-    /**
-     * @notice Contract which oversees inter-cToken operations
-     */
-    ComptrollerInterface public comptroller;
+  /**
+   * @notice Contract which oversees inter-cToken operations
+   */
+  ComptrollerInterface public comptroller;
 
-    /**
-     * @notice Model which tells what the current interest rate should be
-     */
-    InterestRateModel public interestRateModel;
+  /**
+   * @notice Model which tells what the current interest rate should be
+   */
+  InterestRateModel public interestRateModel;
 
-    // Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
-    uint internal initialExchangeRateMantissa;
+  // Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
+  uint256 internal initialExchangeRateMantissa;
 
-    /**
-     * @notice Fraction of interest currently set aside for reserves
-     */
-    uint public reserveFactorMantissa;
+  /**
+   * @notice Fraction of interest currently set aside for reserves
+   */
+  uint256 public reserveFactorMantissa;
 
-    /**
-     * @notice Block number that interest was last accrued at
-     */
-    uint public accrualBlockNumber;
+  /**
+   * @notice Block number that interest was last accrued at
+   */
+  uint256 public accrualBlockNumber;
 
-    /**
-     * @notice Accumulator of the total earned interest rate since the opening of the market
-     */
-    uint public borrowIndex;
+  /**
+   * @notice Accumulator of the total earned interest rate since the opening of the market
+   */
+  uint256 public borrowIndex;
 
-    /**
-     * @notice Total amount of outstanding borrows of the underlying in this market
-     */
-    uint public totalBorrows;
+  /**
+   * @notice Total amount of outstanding borrows of the underlying in this market
+   */
+  uint256 public totalBorrows;
 
-    /**
-     * @notice Total amount of reserves of the underlying held in this market
-     */
-    uint public totalReserves;
+  /**
+   * @notice Total amount of reserves of the underlying held in this market
+   */
+  uint256 public totalReserves;
 
-    /**
-     * @notice Total number of tokens in circulation
-     */
-    uint public totalSupply;
+  /**
+   * @notice Total number of tokens in circulation
+   */
+  uint256 public totalSupply;
 
-    /**
-     * @notice Withdraw fee for strategy vaults
-     */
-    uint256 public withdrawFee;
+  /**
+   * @notice Withdraw fee for strategy vaults
+   */
+  uint256 public withdrawFee;
 
-    /**
-     * @notice Management fee for strategy vaults
-     */
-    uint256 public performanceFee;
+  /**
+   * @notice Management fee for strategy vaults
+   */
+  uint256 public performanceFee;
 
-    uint256 public exchangeRateBefore;
-    uint256 public blocksBetweenRateChange;
+  uint256 public exchangeRateBefore;
+  uint256 public blocksBetweenRateChange;
 
-    // Official record of token balances for each account
-    mapping (address => uint) internal accountTokens;
+  // Official record of token balances for each account
+  mapping(address => uint256) internal accountTokens;
 
-    uint256 public constant performanceFeeMAX = 3000;
-    uint256 public constant withdrawFeeMAX = 300;
+  uint256 public constant performanceFeeMAX = 3000;
+  uint256 public constant withdrawFeeMAX = 300;
 
-    // Approved token transfer amounts on behalf of others
-    mapping (address => mapping (address => uint)) internal transferAllowances;
+  // Approved token transfer amounts on behalf of others
+  mapping(address => mapping(address => uint256)) internal transferAllowances;
 
-    /**
-     * @notice Container for borrow balance information
-     * @member principal Total balance (with accrued interest), after applying the most recent balance-changing action
-     * @member interestIndex Global borrowIndex as of the most recent balance-changing action
-     */
-    struct BorrowSnapshot {
-        uint principal;
-        uint interestIndex;
-    }
+  /**
+   * @notice Container for borrow balance information
+   * @member principal Total balance (with accrued interest), after applying the most recent balance-changing action
+   * @member interestIndex Global borrowIndex as of the most recent balance-changing action
+   */
+  struct BorrowSnapshot {
+    uint256 principal;
+    uint256 interestIndex;
+  }
 
-    // Mapping of account addresses to outstanding borrow balances
-    mapping(address => BorrowSnapshot) internal accountBorrows;
+  // Mapping of account addresses to outstanding borrow balances
+  mapping(address => BorrowSnapshot) internal accountBorrows;
 
-    /**
-     * @notice Share of seized collateral that is added to reserves
-     */
-    uint public constant protocolSeizeShareMantissa = 2.8e16; //2.8%
+  /**
+   * @notice Share of seized collateral that is added to reserves
+   */
+  uint256 public constant protocolSeizeShareMantissa = 2.8e16; //2.8%
 
-    // used for calculating interest rate performance of GLP vault market
-    uint public prevExchangeRate;
-    uint public glpBlockDelta;
-    uint256 public autoCompoundBlockThreshold = 7000;
-    uint public lastGlpDepositAmount;
-    uint public depositsDuringLastInterval;
-
+  // used for calculating interest rate performance of GLP vault market
+  uint256 public prevExchangeRate;
+  uint256 public glpBlockDelta;
+  uint256 public autoCompoundBlockThreshold = 7000;
+  uint256 public lastGlpDepositAmount;
+  uint256 public depositsDuringLastInterval;
 }
 
 abstract contract CTokenInterface is CTokenStorage {
-    /**
-     * @notice Indicator that this is a CToken contract (for inspection)
-     */
-    bool public constant isCToken = true;
+  /**
+   * @notice Indicator that this is a CToken contract (for inspection)
+   */
+  bool public constant isCToken = true;
 
-    /*** Market Events ***/
+  /**
+   * Market Events **
+   */
 
-    /**
-     * @notice Event emitted when interest is accrued
-     */
-    event AccrueInterest(uint cashPrior, uint interestAccumulated, uint borrowIndex, uint totalBorrows);
+  /**
+   * @notice Event emitted when interest is accrued
+   */
+  event AccrueInterest(uint256 cashPrior, uint256 interestAccumulated, uint256 borrowIndex, uint256 totalBorrows);
 
-    /**
-     * @notice Event emitted when tokens are minted
-     */
-    event Mint(address minter, uint mintAmount, uint mintTokens);
+  /**
+   * @notice Event emitted when tokens are minted
+   */
+  event Mint(address minter, uint256 mintAmount, uint256 mintTokens);
 
-    /**
-     * @notice Event emitted when tokens are redeemed
-     */
-    event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
+  /**
+   * @notice Event emitted when tokens are redeemed
+   */
+  event Redeem(address redeemer, uint256 redeemAmount, uint256 redeemTokens);
 
-    /**
-     * @notice Event emitted when underlying is borrowed
-     */
-    event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
+  /**
+   * @notice Event emitted when underlying is borrowed
+   */
+  event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows);
 
-    /**
-     * @notice Event emitted when a borrow is repaid
-     */
-    event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
+  /**
+   * @notice Event emitted when a borrow is repaid
+   */
+  event RepayBorrow(address payer, address borrower, uint256 repayAmount, uint256 accountBorrows, uint256 totalBorrows);
 
-    /**
-     * @notice Event emitted when a borrow is liquidated
-     */
-    event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
+  /**
+   * @notice Event emitted when a borrow is liquidated
+   */
+  event LiquidateBorrow(
+    address liquidator, address borrower, uint256 repayAmount, address cTokenCollateral, uint256 seizeTokens
+  );
 
+  /**
+   * Admin Events **
+   */
 
-    /*** Admin Events ***/
+  /**
+   * @notice Event emitted when pendingAdmin is changed
+   */
+  event NewPendingAdmin(address oldPendingAdmin, address newPendingAdmin);
 
-    /**
-     * @notice Event emitted when pendingAdmin is changed
-     */
-    event NewPendingAdmin(address oldPendingAdmin, address newPendingAdmin);
+  /**
+   * @notice Event emitted when pendingAdmin is accepted, which means admin is updated
+   */
+  event NewAdmin(address oldAdmin, address newAdmin);
 
-    /**
-     * @notice Event emitted when pendingAdmin is accepted, which means admin is updated
-     */
-    event NewAdmin(address oldAdmin, address newAdmin);
+  /**
+   * @notice Event emitted when comptroller is changed
+   */
+  event NewComptroller(ComptrollerInterface oldComptroller, ComptrollerInterface newComptroller);
 
-    /**
-     * @notice Event emitted when comptroller is changed
-     */
-    event NewComptroller(ComptrollerInterface oldComptroller, ComptrollerInterface newComptroller);
+  /**
+   * @notice Event emitted when interestRateModel is changed
+   */
+  event NewMarketInterestRateModel(InterestRateModel oldInterestRateModel, InterestRateModel newInterestRateModel);
 
-    /**
-     * @notice Event emitted when interestRateModel is changed
-     */
-    event NewMarketInterestRateModel(InterestRateModel oldInterestRateModel, InterestRateModel newInterestRateModel);
+  /**
+   * @notice Event emitted when the reserve factor is changed
+   */
+  event NewReserveFactor(uint256 oldReserveFactorMantissa, uint256 newReserveFactorMantissa);
 
-    /**
-     * @notice Event emitted when the reserve factor is changed
-     */
-    event NewReserveFactor(uint oldReserveFactorMantissa, uint newReserveFactorMantissa);
+  /**
+   * @notice Event emitted when the reserves are added
+   */
+  event ReservesAdded(address benefactor, uint256 addAmount, uint256 newTotalReserves);
 
-    /**
-     * @notice Event emitted when the reserves are added
-     */
-    event ReservesAdded(address benefactor, uint addAmount, uint newTotalReserves);
+  /**
+   * @notice Event emitted when the reserves are reduced
+   */
+  event ReservesReduced(address admin, uint256 reduceAmount, uint256 newTotalReserves);
 
-    /**
-     * @notice Event emitted when the reserves are reduced
-     */
-    event ReservesReduced(address admin, uint reduceAmount, uint newTotalReserves);
+  /**
+   * @notice EIP20 Transfer event
+   */
+  event Transfer(address indexed from, address indexed to, uint256 amount);
 
-    /**
-     * @notice EIP20 Transfer event
-     */
-    event Transfer(address indexed from, address indexed to, uint amount);
+  /**
+   * @notice EIP20 Approval event
+   */
+  event Approval(address indexed owner, address indexed spender, uint256 amount);
 
-    /**
-     * @notice EIP20 Approval event
-     */
-    event Approval(address indexed owner, address indexed spender, uint amount);
+  /**
+   * User Interface **
+   */
 
+  function transfer(address dst, uint256 amount) external virtual returns (bool);
+  function transferFrom(address src, address dst, uint256 amount) external virtual returns (bool);
+  function approve(address spender, uint256 amount) external virtual returns (bool);
+  function allowance(address owner, address spender) external view virtual returns (uint256);
+  function balanceOf(address owner) external view virtual returns (uint256);
+  function balanceOfUnderlying(address owner) external virtual returns (uint256);
+  function getAccountSnapshot(address account) external view virtual returns (uint256, uint256, uint256, uint256);
+  function borrowRatePerBlock() external view virtual returns (uint256);
+  function supplyRatePerBlock() external view virtual returns (uint256);
+  function totalBorrowsCurrent() external virtual returns (uint256);
+  function borrowBalanceCurrent(address account) external virtual returns (uint256);
+  function borrowBalanceStored(address account) external view virtual returns (uint256);
+  function exchangeRateCurrent() external virtual returns (uint256);
+  function exchangeRateStored() external view virtual returns (uint256);
+  function getCash() external view virtual returns (uint256);
+  function accrueInterest() external virtual returns (uint256);
+  function seize(address liquidator, address borrower, uint256 seizeTokens) external virtual returns (uint256);
 
-    /*** User Interface ***/
+  /**
+   * Admin Functions **
+   */
 
-    function transfer(address dst, uint amount) virtual external returns (bool);
-    function transferFrom(address src, address dst, uint amount) virtual external returns (bool);
-    function approve(address spender, uint amount) virtual external returns (bool);
-    function allowance(address owner, address spender) virtual external view returns (uint);
-    function balanceOf(address owner) virtual external view returns (uint);
-    function balanceOfUnderlying(address owner) virtual external returns (uint);
-    function getAccountSnapshot(address account) virtual external view returns (uint, uint, uint, uint);
-    function borrowRatePerBlock() virtual external view returns (uint);
-    function supplyRatePerBlock() virtual external view returns (uint);
-    function totalBorrowsCurrent() virtual external returns (uint);
-    function borrowBalanceCurrent(address account) virtual external returns (uint);
-    function borrowBalanceStored(address account) virtual external view returns (uint);
-    function exchangeRateCurrent() virtual external returns (uint);
-    function exchangeRateStored() virtual external view returns (uint);
-    function getCash() virtual external view returns (uint);
-    function accrueInterest() virtual external returns (uint);
-    function seize(address liquidator, address borrower, uint seizeTokens) virtual external returns (uint);
-
-
-    /*** Admin Functions ***/
-
-    function _setPendingAdmin(address payable newPendingAdmin) virtual external returns (uint);
-    function _acceptAdmin() virtual external returns (uint);
-    function _setComptroller(ComptrollerInterface newComptroller) virtual external returns (uint);
-    function _setReserveFactor(uint newReserveFactorMantissa) virtual external returns (uint);
-    function _reduceReserves(uint reduceAmount) virtual external returns (uint);
-    function _setInterestRateModel(InterestRateModel newInterestRateModel) virtual external returns (uint);
-    function _setGlpAddresses(address stakedGLP_, address glpRewardRouter_, address glpManager_, address gmxToken_, address stakedGmxTracker_, address sbfGMX_) virtual public returns (uint);
-    function _signalTransfer(address recipient) virtual public returns (uint);
-    function _setAutocompoundRewards(bool autocompound_) virtual public returns (uint);
-    function _setAutoCompoundBlockThreshold(uint256 autoCompoundBlockThreshold_) virtual public returns (uint);
-    function _setVaultFees(uint256 withdrawFee_, uint256 performanceFee_) virtual public returns (uint);
+  function _setPendingAdmin(address payable newPendingAdmin) external virtual returns (uint256);
+  function _acceptAdmin() external virtual returns (uint256);
+  function _setComptroller(ComptrollerInterface newComptroller) external virtual returns (uint256);
+  function _setReserveFactor(uint256 newReserveFactorMantissa) external virtual returns (uint256);
+  function _reduceReserves(uint256 reduceAmount) external virtual returns (uint256);
+  function _setInterestRateModel(InterestRateModel newInterestRateModel) external virtual returns (uint256);
+  function _setGlpAddresses(
+    address stakedGLP_,
+    address glpRewardRouter_,
+    address glpManager_,
+    address gmxToken_,
+    address stakedGmxTracker_,
+    address sbfGMX_
+  ) public virtual returns (uint256);
+  function _signalTransfer(address recipient) public virtual returns (uint256);
+  function _setAutocompoundRewards(bool autocompound_) public virtual returns (uint256);
+  function _setAutoCompoundBlockThreshold(uint256 autoCompoundBlockThreshold_) public virtual returns (uint256);
+  function _setVaultFees(uint256 withdrawFee_, uint256 performanceFee_) public virtual returns (uint256);
 }
 
 contract CErc20Storage {
-    /**
-     * @notice Underlying asset for this CToken
-     */
-    address public underlying;
+  /**
+   * @notice Underlying asset for this CToken
+   */
+  address public underlying;
 }
 
 abstract contract CErc20Interface is CErc20Storage {
+  /**
+   * User Interface **
+   */
 
-    /*** User Interface ***/
+  function mint(uint256 mintAmount) external virtual returns (uint256);
+  function redeem(uint256 redeemTokens) external virtual returns (uint256);
+  function redeemUnderlying(uint256 redeemAmount) external virtual returns (uint256);
+  function redeemUnderlyingForUser(uint256 redeemAmount, address user) external virtual returns (uint256);
+  function borrow(uint256 borrowAmount) external virtual returns (uint256);
+  function repayBorrow(uint256 repayAmount) external virtual returns (uint256);
+  function repayBorrowBehalf(address borrower, uint256 repayAmount) external virtual returns (uint256);
+  function liquidateBorrow(address borrower, uint256 repayAmount, CTokenInterface cTokenCollateral)
+    external
+    virtual
+    returns (uint256);
+  function sweepToken(EIP20NonStandardInterface token) external virtual;
+  function compound() external virtual returns (uint256);
 
-    function mint(uint mintAmount) virtual external returns (uint);
-    function redeem(uint redeemTokens) virtual external returns (uint);
-    function redeemUnderlying(uint redeemAmount) virtual external returns (uint); 
-    function redeemUnderlyingForUser(uint redeemAmount, address user) virtual external returns (uint); 
-    function borrow(uint borrowAmount) virtual external returns (uint);
-    function repayBorrow(uint repayAmount) virtual external returns (uint);
-    function repayBorrowBehalf(address borrower, uint repayAmount) virtual external returns (uint);
-    function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) virtual external returns (uint);
-    function sweepToken(EIP20NonStandardInterface token) virtual external;
-    function compound() virtual external returns (uint);
-    
+  /**
+   * Admin Functions **
+   */
 
-    /*** Admin Functions ***/
-
-    function _addReserves(uint addAmount) virtual external returns (uint);
+  function _addReserves(uint256 addAmount) external virtual returns (uint256);
 }
 
 contract CDelegationStorage {
-    /**
-     * @notice Implementation address for this contract
-     */
-    address public implementation;
+  /**
+   * @notice Implementation address for this contract
+   */
+  address public implementation;
 }
 
 abstract contract CDelegatorInterface is CDelegationStorage {
-    /**
-     * @notice Emitted when implementation is changed
-     */
-    event NewImplementation(address oldImplementation, address newImplementation);
+  /**
+   * @notice Emitted when implementation is changed
+   */
+  event NewImplementation(address oldImplementation, address newImplementation);
 
-    /**
-     * @notice Called by the admin to update the implementation of the delegator
-     * @param implementation_ The address of the new implementation for delegation
-     * @param allowResign Flag to indicate whether to call _resignImplementation on the old implementation
-     * @param becomeImplementationData The encoded bytes data to be passed to _becomeImplementation
-     */
-    function _setImplementation(address implementation_, bool allowResign, bytes memory becomeImplementationData) virtual external;
+  /**
+   * @notice Called by the admin to update the implementation of the delegator
+   * @param implementation_ The address of the new implementation for delegation
+   * @param allowResign Flag to indicate whether to call _resignImplementation on the old implementation
+   * @param becomeImplementationData The encoded bytes data to be passed to _becomeImplementation
+   */
+  function _setImplementation(address implementation_, bool allowResign, bytes memory becomeImplementationData)
+    external
+    virtual;
 }
 
 abstract contract CDelegateInterface is CDelegationStorage {
-    /**
-     * @notice Called by the delegator on a delegate to initialize it for duty
-     * @dev Should revert if any issues arise which make it unfit for delegation
-     * @param data The encoded bytes data for any initialization
-     */
-    function _becomeImplementation(bytes memory data) virtual external;
+  /**
+   * @notice Called by the delegator on a delegate to initialize it for duty
+   * @dev Should revert if any issues arise which make it unfit for delegation
+   * @param data The encoded bytes data for any initialization
+   */
+  function _becomeImplementation(bytes memory data) external virtual;
 
-    /**
-     * @notice Called by the delegator on a delegate to forfeit its responsibility
-     */
-    function _resignImplementation() virtual external;
+  /**
+   * @notice Called by the delegator on a delegate to forfeit its responsibility
+   */
+  function _resignImplementation() external virtual;
 }
