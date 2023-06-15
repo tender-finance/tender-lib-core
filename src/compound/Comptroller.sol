@@ -11,6 +11,7 @@ import {Comp} from "./Governance/Comp.sol";
 import {ExponentialNoError} from "./ExponentialNoError.sol";
 import {EIP20Interface} from "./EIP20Interface.sol";
 import {IERC721} from "oz/interfaces/IERC721.sol";
+import {Position} from './PositionManager.sol';
 
 /**
  * @title Compound's Comptroller Contract

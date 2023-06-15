@@ -6,6 +6,7 @@ import "./IUniswapV3SwapCallback.sol";
 /// @notice Functions for swapping tokens via Uniswap V3
 
 interface IV3SwapRouter is IUniswapV3SwapCallback {
+  function factory() external view returns (address);
   struct ExactInputSingleParams {
     address tokenIn;
     address tokenOut;

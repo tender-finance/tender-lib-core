@@ -286,6 +286,8 @@ abstract contract CTokenInterface is CTokenStorage {
   function totalBorrowsCurrent() external virtual returns (uint256);
   function borrowBalanceCurrent(address account) external virtual returns (uint256);
   function borrowBalanceStored(address account) external view virtual returns (uint256);
+  function borrowBalanceCurrentPartial(address account, uint principal) external virtual returns (uint256);
+  function borrowBalanceStoredPartial(address account, uint principal) external view virtual returns (uint256);
   function exchangeRateCurrent() external virtual returns (uint256);
   function exchangeRateStored() external view virtual returns (uint256);
   function getCash() external view virtual returns (uint256);

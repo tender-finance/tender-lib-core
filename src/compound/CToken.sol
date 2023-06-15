@@ -229,7 +229,6 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
     accrueInterest();
     return totalBorrows;
   }
-
   /**
    * @notice Accrue interest to updated borrowIndex and then calculate account's borrow balance using the updated borrowIndex
    * @param account The address whose balance should be calculated after updating borrowIndex
@@ -239,6 +238,34 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
     accrueInterest();
     return borrowBalanceStored(account);
   }
+
+  function borrowBalanceCurrentPartial(address account, uint principal) external override nonReentrant returns (uint256) {
+    accrueInterest();
+    return borrowBalanceStoredPartialInternal(account, principal);
+  }
+
+  function borrowBalanceStoredPartial(address account, uint principal) external view override returns (uint) {
+    return borrowBalanceStoredPartialInternal(account, principal);
+  }
+
+  function borrowBalanceStoredPartialInternal(address account, uint principal) internal view returns (uint) {
+    /* Get borrowBalance and borrowIndex */
+    BorrowSnapshot storage borrowSnapshot = accountBorrows[account];
+
+    /* If borrowBalance = 0 then borrowIndex is likely also 0.
+     * Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
+     */
+    if (principal == 0) {
+      return 0;
+    }
+
+    /* Calculate new borrow balance using the interest index:
+         *  recentBorrowBalance = borrower.borrowBalance * market.borrowIndex / borrower.borrowIndex
+         */
+    uint256 principalTimesIndex = principal * borrowIndex;
+    return principalTimesIndex / borrowSnapshot.interestIndex;
+  }
+
 
   /**
    * @notice Return the borrow balance of account based on stored data
