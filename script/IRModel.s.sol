@@ -20,14 +20,33 @@ contract Deploy is Script {
     ICToken(payable(Addresses.tMAGIC)),
     ICToken(payable(Addresses.tWETH))
   ];
+    uint256 public baseRatePerYear = 10000000000000000;
+    uint256 multiplierPerYear = 0;
+    uint256 jumpMultiplierPerYear = 10000000000000000;
+    uint256 kink_ = 900000000000000000;
   function run() public {
     vm.startBroadcast(vm.envUint('PRIVATE_KEY'));
-    address irModel = address(new JumpRateModelGLP(Addresses.admin));
-    for(uint i = 0; i < markets.length; i++) {
-      ICToken market = markets[i];
-      console.log(market.admin());
-      market._setInterestRateModel(irModel);
-    }
+    address irModel = address(new JumpRateModelGLP(baseRatePerYear, multiplierPerYear, jumpMultiplierPerYear, kink_, Addresses.admin));
+    // for(uint i = 0; i < markets.length; i++) {
+    //   ICToken market = markets[i];
+    //   console.log(market.admin());
+    //   market._setInterestRateModel(irModel);
+    // }
+    console.log(irModel.getEthPerInterval());
+    console.log(irModel.getEthPrice());
+    console.log(irModel.getGlpPrice());
+    console.log(irModel.getGlpAmountTokenPerInterval());
+    console.log(irModel.getGlpAmountTokenPerInterval_());
+    console.log(irModel.getEthPerYear());
+    console.log(irModel.getGlpApy());
+    console.log(irModel.getBaseRatePerBlock());
+    console.log(irModel.getMultiplierPreKink());
+    console.log(irModel.getMultiplierPostKink(500000000000000000));
+    console.log(irModel.getJumpMultiplierPerBlock(500000000000000000));
+ 
+
+    
+
     vm.stopBroadcast();
   }
 }
