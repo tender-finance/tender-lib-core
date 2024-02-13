@@ -334,7 +334,7 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
   /**
    * @notice Compound rewards earned
    */
-  function compoundFresh() internal {
+  function compoundFresh() internal virtual {
     if (totalSupply == 0 || !isGLP) {
       return;
     }
@@ -440,7 +440,7 @@ abstract contract CToken is CTokenInterface, ExponentialNoError, TokenErrorRepor
    * @dev Accrues interest whether or not the operation succeeds, unless reverted
    * @param mintAmount The amount of the underlying asset to supply
    */
-  function mintInternal(uint256 mintAmount) internal nonReentrant {
+  function mintInternal(uint256 mintAmount) internal virtual nonReentrant {
     accrueInterest();
     if (autocompound) {
       compoundFresh();

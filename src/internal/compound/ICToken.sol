@@ -6,7 +6,7 @@ import {IGlpManager} from "../../external/gmx/IGlpManager.sol";
 import {IRewardRouterV2} from "../../external/gmx/IRewardRouterV2.sol";
 import {IStakedGlp} from "../../external/gmx/IStakedGlp.sol";
 import {IRewardTracker} from "../../external/gmx/IRewardTracker.sol";
-import {IComptroller} from "../../external/compound/Comptroller.sol";
+import {IComptroller} from "../../external/compound/IComptroller.sol";
 import {InterestRateModel} from "../../external/compound/InterestRateModel.sol";
 
 interface ICToken is IERC20 {
