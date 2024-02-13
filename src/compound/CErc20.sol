@@ -65,7 +65,7 @@ contract CErc20 is CToken, CErc20Interface {
     return NO_ERROR;
   }
 
-  function compound() external override returns (uint256) {
+  function compound() external virtual override returns (uint256) {
     compoundInternal();
     return NO_ERROR;
   }
