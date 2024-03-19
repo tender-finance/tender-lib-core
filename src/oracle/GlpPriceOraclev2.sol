@@ -148,7 +148,7 @@ contract GlpPriceOraclev2 is IChainlinkPriceOracle {
     view
     returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)
   {
-    return (0, getGlpPrice(), 0, 0, 0);
+    return (0, _getGMTokenPrice(), 0, 0, 0);
   }
 
   function _getLongTokenPrice(IERC20 underlying) internal view returns (uint256) {
