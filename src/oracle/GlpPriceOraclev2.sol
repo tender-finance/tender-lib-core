@@ -110,14 +110,15 @@ interface DataStore{
   function getUint(bytes32 key) external view returns (uint256);
 }
 
-contract GlpPriceOracle is IChainlinkPriceOracle {
+contract GlpPriceOraclev2 is IChainlinkPriceOracle {
   using SafeMath for uint256;
-  
+
   address public marketToken = 0x70d95587d40A2caf56bd97485aB3Eec10Bee6336;
-  address constant public WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
-  address constant public USDC = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
-  address constant GMX_EXCHANGE_ROUTER = address(0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8);
-  TenderPriceOracle tenderOracle = TenderPriceOracle();
+  address constant public WETH_CONTRACT = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
+  address constant public USDC_CONTRACT = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
+  address constant _GMX_EXCHANGE_ROUTER = address(0x7C68C7866A64FA2160F78EEaE12217FFbf871fa8);
+  address constant _GMX_EXCHANGE_READER = address(0x60a0fF4cDaF0f6D496d71e0bC0fFa86FE8E6B23c);
+  TenderPriceOracle _tenderOracle = TenderPriceOracle(0x0c261270eD2E036c9525243E5Dd0e95f824D77d2);
   IERC20 public immutable glpToken = IERC20(0x4277f8F2c384827B5273592FF7CeBd9f2C1ac258);
   IGlpManager public immutable glpManager = IGlpManager(0x321F653eED006AD1C29D174e17d96351BDe22649);
   IGmxVault public glpVault = IGmxVault(0x489ee077994B6658eAfA855C308275EAd8097C4A);
@@ -150,31 +151,32 @@ contract GlpPriceOracle is IChainlinkPriceOracle {
     return (0, getGlpPrice(), 0, 0, 0);
   }
 
-  function getLongTokenPrice(IERC20 underlying) internal view returns (uint256) {
-    IChainlinkPriceOracle oracle = getOracle(underlying);
-    uint256 price = uint256(oracle.latestAnswer());
+  function _getLongTokenPrice(IERC20 underlying) internal view returns (uint256) {
+    IChainlinkPriceOracle _oracle = _tenderOracle.getOracle(underlying);
+    (, int256 _latestPrice, , ,) = _oracle.latestRoundData();
+    uint256 price = uint256(_latestPrice);
     return price.mul(10 ** 10); // Should be normalized to 18 decimals
     // The short token USDC is assumed to have a price of $1 for sake of this strategy
   }
-    
 
-  function getGMTokenPrice() public view returns (uint256) {
-    address datastoreAddress = GMXRouter(GMX_EXCHANGE_ROUTER).dataStore();
-    GMXReader reader = GMXReader(GMX_EXCHANGE_READER);
+  // NOTE: _getGMTokenPrice is locked to the markets defined in the contract
+  function _getGMTokenPrice() internal view returns (uint256) {
+    address datastoreAddress = GMXRouter(_GMX_EXCHANGE_ROUTER).dataStore();
+    GMXReader reader = GMXReader(_GMX_EXCHANGE_READER);
     GMXReader.MarketProps memory _marketProp = reader.getMarket(datastoreAddress, marketToken);
     bytes32 pnlFactor = keccak256(abi.encode("MAX_PNL_FACTOR_FOR_WITHDRAWALS")); // Use this pnl cap for all token price calculations
     GMXReader.PriceProps memory longPrice;
     {
-      uint256 price = getLongTokenPrice(stratAddress, gmTokenIndex);
+      uint256 price = _getLongTokenPrice(IERC20(WETH_CONTRACT));
       // Adjust the price to normalize it for GMX
       // Adjust to 30 decimals then subtract amount of decimals in token
-      price = price.mul(10**12).div(10 ** getOracleDecimals(marketToken));
+      price = price.mul(10**12).div(10 ** _tenderOracle.getOracleDecimals(IERC20(marketToken)));
       longPrice.max = price;
       longPrice.min = price;
     }
     GMXReader.PriceProps memory shortPrice;
     {
-      uint256 price = uint256(1e30).div(10 ** uint256(IERC20(USDC_ADDRESS).decimals()));
+      uint256 price = uint256(1e30).div(10 ** uint256(IERC20(USDC_CONTRACT).decimals()));
       shortPrice.max = price;
       shortPrice.min = price;
     }
