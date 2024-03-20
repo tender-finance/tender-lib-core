@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.8.0;
 
-import {IComptroller} from "../src/external/compound/Comptroller.sol";
+import {IComptroller} from "../src/external/compound/IComptroller.sol";
 import {ICToken} from "../src/external/compound/ICToken.sol";
 import {Addresses} from "../script/shared/Addresses.sol";
 import {ITenderPriceOracle} from "../src/external/oracle/ITenderPriceOracle.sol";
