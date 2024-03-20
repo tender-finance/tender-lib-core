@@ -1,9 +1,9 @@
-.PHONY: test-upgrade
+.PHONY:
 
-test-upgrade: ./test/UpgradeOracle.t.sol
+test-upgrade:
 	forge t -f http://localhost:8545 --mp ./test/UpgradeOracle.t.sol
 
-test-upgrade-v: ./test/UpgradeOracle.t.sol
+test-upgrade-v:
 	forge t -f http://localhost:8545 --mp ./test/UpgradeOracle.t.sol -vv
 
 anvil:
