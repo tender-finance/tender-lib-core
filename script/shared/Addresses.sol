@@ -30,6 +30,7 @@ library Addresses {
   address public constant tMAGIC = 0x4180f39294c94F046362c2DBC89f2DF7786842c3;
   address public constant tWETH = 0x242f91207184FCc220beA3c9E5f22b6d80F3faC5;
   address public constant unitroller = 0xeed247Ba513A8D6f78BE9318399f5eD1a4808F8e;
+  address public constant oracle = 0x0c261270eD2E036c9525243E5Dd0e95f824D77d2;
 
   // GMX Addresses
   address public constant glpToken = 0x4277f8F2c384827B5273592FF7CeBd9f2C1ac258;
@@ -39,7 +40,7 @@ library Addresses {
   address public constant glpRouter = 0xB95DB5B167D75e6d04227CfFFA61069348d271F5;
   address public constant stakedGlp = 0x2F546AD4eDD93B956C8999Be404cdCAFde3E89AE;
 
-  address public constant admin = 0x85aBbC0f8681c4fB33B6a3A601AD99E92A32D1ac;
+  address public constant admin = 0x1eB815F153e54Fa6547A402A7dE6D6D66e2EB7b0;
   address public constant multisig = 0x80b54e18e5Bb556C6503e1C6F2655749c9e41Da2;
 
   address public constant flashVault = 0xBA12222222228d8Ba445958a75a0704d566BF2C8;
